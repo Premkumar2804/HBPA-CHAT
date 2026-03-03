@@ -899,30 +899,6 @@
       fill: currentColor;
     }
 
-    /* Mock Login Style */
-    .mock-google-btn {
-      background: white;
-      color: #757575;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      padding: 10px;
-      font-weight: 500;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      font-family: 'Roboto', sans-serif;
-      transition: background 0.2s;
-    }
-
-    .mock-google-btn:hover {
-      background: #f7f7f7;
-    }
-
-    .mock-google-btn img {
-      width: 18px;
-    }
 
     .login-overlay {
       background: linear-gradient(135deg, rgba(11, 20, 26, 0.95), rgba(0, 92, 75, 0.8));
@@ -942,22 +918,8 @@
         <p>Login to start chatting</p>
       </div>
 
-      <div id="googleBtnWrapper">
-        <!-- Official Google Button (Will show if you put real ID) -->
-        <div id="g_id_onload" data-client_id="YOUR_GOOGLE_CLIENT_ID_HERE" data-callback="handleGoogleLogin"
-          data-auto_prompt="false">
-        </div>
-        <div class="g_id_signin" data-type="standard"></div>
-
-        <!-- Developer Mock Button (For testing without ID) -->
-        <button id="mockGoogleBtn" class="mock-google-btn" style="margin-top: 15px; width: 100%;">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google">
-          <span>Sign in with Google (Dev Mock)</span>
-        </button>
-      </div>
 
       <div class="guest-login-section">
-        <p>OR</p>
         <input type="text" id="guestNameInput" class="guest-input" placeholder="Enter your name">
         <button id="guestLoginBtn" class="guest-btn">Quick Guest Login</button>
       </div>
@@ -1097,16 +1059,6 @@
       }, 300);
     }
 
-    // Google Login Callback
-    window.handleGoogleLogin = (response) => {
-      const payload = JSON.parse(atob(response.credential.split('.')[1]));
-      handleLogin(payload.name, payload.picture);
-    };
-
-    // Mock Google Login for testing
-    document.getElementById('mockGoogleBtn').addEventListener('click', () => {
-      handleLogin('Test User', 'https://i.pravatar.cc/150?u=test');
-    });
 
     guestLoginBtn.addEventListener('click', () => {
       const name = guestNameInput.value.trim() || 'Guest';
