@@ -1,7 +1,7 @@
 const { text } = require("express");
 
 //mock database
-let messages=[
+let messages = [
     {
         id: 1,
         text: "Hello Welcome to the real chat App with HBPA",
@@ -11,95 +11,115 @@ let messages=[
     {
         id: 2,
         text: "Hello Welcome to the real chat App with HBPA",
-        user:"HBPA",
+        user: "HBPA",
         timestamp: new Date().toISOString(),
     },
 ];
 
 
 //Get the Messages
-const getMessages=(req,res)=>{
-    try{
+const getMessages = (req, res) => {
+    try {
         res.json({
-            success:true,
+            success: true,
             count: messages.length,
-            data:messages  
+            data: messages
         })
-    } catch(error){
+    } catch (error) {
         res.status(500).json({
-            success:false,
+            success: false,
             message: 'Internal Server Error',
-            error:error.message
+            error: error.message
         })
 
     }
 }
 
 //Post the messages
-const createMessages=(req,res)=>{
-    try{
-        const {text,user}=req.body;
+const createMessages = (req, res) => {
+    try {
+        const { text, user } = req.body;
 
         //validation
-        if(!text|| !user){
+        if (!text || !user) {
             return res.status(400).json({
                 success: false,
                 message: 'Please Provide the Message'
             })
         }
         //if Validation is given here
-        const newMessage={
-            id:messages.length+1,
+        const newMessage = {
+            id: messages.length + 1,
             text,
             user,
+            type: req.body.type || 'text',
+            voice: req.body.voice || null,
+            image: req.body.image || null,
+            avatar: req.body.avatar || null,
+            status: 'sent',
             timestamp: new Date().toISOString()
         };
         messages.push(newMessage);
         res.status(201).json({
-            success:true,
+            success: true,
             message: "Message Created",
-            data:newMessage
+            data: newMessage
         });
-    } catch(error){
+    } catch (error) {
         res.status(500).json({
-            success:false,
+            success: false,
             message: 'Internal Server Error',
-            error:error.message
+            error: error.message
         })
 
     }
 }
 //Delete Messages
-const deleteAllMessages=(req,res)=>{
-    try{
-        messages=[];
+const deleteAllMessages = (req, res) => {
+    try {
+        messages = [];
         res.json({
-            success:true,
-            message:'All Messages are Deleted'
+            success: true,
+            message: 'All Messages are Deleted'
         })
-    } catch(error){
+    } catch (error) {
         res.status(500).json({
-            success:false,
+            success: false,
             message: 'Internal Server Error',
-            error:error.message
+            error: error.message
         })
     }
 }
 //Adding newmessages like dynamic
-const addMessage=(messageData)=>{
-    const newMessage={
-        id:messages.length+1,
-        text:messageData.text,
-        user:messageData.user,
-        timestamp:new Date().toISOString()
+const addMessage = (messageData) => {
+    const newMessage = {
+        id: messages.length + 1,
+        text: messageData.text,
+        user: messageData.user,
+        type: messageData.type || 'text',
+        voice: messageData.voice || null,
+        image: messageData.image || null,
+        avatar: messageData.avatar || null,
+        status: 'sent',
+        timestamp: new Date().toISOString()
     }
     messages.push(newMessage);
     return newMessage;
 }
 
-module.exports={
+const updateMessageStatus = (id, status) => {
+    const message = messages.find(m => m.id === id);
+    if (message) {
+        message.status = status;
+        return message;
+    }
+    return null;
+}
+
+module.exports = {
     getMessages,
     createMessages,
     deleteAllMessages,
-    addMessage
+    addMessage,
+    updateMessageStatus
 }

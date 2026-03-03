@@ -3,7 +3,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const http = require('http');
 const { Server } = require('socket.io');
-const { addMessage } = require('./controllers/messageControllers');
+const { addMessage, updateMessageStatus } = require('./controllers/messageControllers');
 const { Socket } = require('net');
 
 //dotenv    in our server,js
@@ -67,9 +67,16 @@ io.on('connection', (socket) => {
     });
     //send and receive funn
     socket.on("sendMessage", (data) => {
-        const newMessage=addMessage(data);
+        const newMessage = addMessage(data);
 
         io.emit('receiveMessage', newMessage);
+    });
+
+    socket.on("markAsSeen", (messageId) => {
+        const updatedMessage = updateMessageStatus(messageId, 'seen');
+        if (updatedMessage) {
+            io.emit('messageStatusUpdate', { id: messageId, status: 'seen' });
+        }
     });
 
     /// disconnect function
