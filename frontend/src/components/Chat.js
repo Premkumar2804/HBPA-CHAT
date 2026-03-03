@@ -5,8 +5,10 @@ import MessageList from "./MessageList";
 import ChatInput from "./ChatInput";
 import "./Chat.css";
 
-const socket = io(process.env.REACT_APP_SOCKET_URL);
-
+const socket = io(process.env.REACT_APP_SOCKET_URL, {
+  transports: ["websocket"],
+  withCredentials: true,
+});
 function Chat() {
   const [messages, setMessages] = useState([]);
   const [isConnected, setIsConnected] = useState(false);
