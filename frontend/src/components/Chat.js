@@ -83,15 +83,14 @@ function Chat() {
         <div className="header-left">
           <div className="header-icon">💬</div>
           <div className="header-info">
-            <h1>Real-Time Chat</h1>
+            <h1>HBPA Chat</h1>
             {/*  REMOVED - Online count display */}
           </div>
         </div>
         <div className="status">
           <div
-            className={`status-dot ${
-              isConnected ? "connected" : "disconnected"
-            }`}
+            className={`status-dot ${isConnected ? "connected" : "disconnected"
+              }`}
           ></div>
           <span>{isConnected ? "Connected" : "Disconnected"}</span>
         </div>
