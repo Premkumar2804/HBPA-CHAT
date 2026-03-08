@@ -1,5 +1,4 @@
-//  Message List Component
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import "./MessageList.css";
 
 const VoicePlayer = ({ src }) => {
@@ -17,7 +16,7 @@ const VoicePlayer = ({ src }) => {
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
-  const updateProgress = () => {
+  const updateProgress = useCallback(() => {
     if (audioRef.current) {
       const current = audioRef.current.currentTime;
       const total = audioRef.current.duration;
@@ -29,7 +28,7 @@ const VoicePlayer = ({ src }) => {
         requestRef.current = requestAnimationFrame(updateProgress);
       }
     }
-  };
+  }, [isPlaying]);
 
   useEffect(() => {
     if (isPlaying) {
@@ -38,7 +37,7 @@ const VoicePlayer = ({ src }) => {
       cancelAnimationFrame(requestRef.current);
     }
     return () => cancelAnimationFrame(requestRef.current);
-  }, [isPlaying]);
+  }, [isPlaying, updateProgress]);
 
   const togglePlay = () => {
     if (audioRef.current.paused) {
