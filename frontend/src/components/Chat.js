@@ -1,5 +1,5 @@
 // 🔄 UPDATED FILE - Remove online users tracking
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { io } from "socket.io-client";
 import MessageList from "./MessageList";
 import ChatInput from "./ChatInput";
