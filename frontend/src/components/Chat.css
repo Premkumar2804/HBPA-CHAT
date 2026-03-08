@@ -1,104 +1,150 @@
-/* 🔄 UPDATED FILE - Remove online count styles */
+/*  Chat Component Styles */
+:root {
+  --wa-bg: #e5ddd5;
+  --wa-header: #075e54;
+  --wa-accent: #25d366;
+  --wa-text: #111b21;
+}
+
+[data-theme='dark'] {
+  --wa-bg: #0b141a;
+  --wa-header: #202c33;
+  --wa-accent: #00a884;
+  --wa-text: #e9edef;
+}
+
+.App {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #dadbd3;
+}
+
+[data-theme='dark'] .App {
+  background: #0b141a;
+}
+
 .chat-container {
-  background: white;
+  background: var(--wa-bg);
   width: 100%;
-  max-width: 900px;
-  height: 90vh;
-  border-radius: 20px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 1400px;
+  height: 95vh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  position: relative;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
 }
 
 .chat-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--wa-header);
   color: white;
-  padding: 20px 25px;
+  padding: 10px 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  z-index: 10;
 }
 
 .header-left {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 12px;
 }
 
-.header-icon {
-  width: 50px;
-  height: 50px;
-  background: rgba(255, 255, 255, 0.2);
+.header-avatar {
+  width: 40px;
+  height: 40px;
+  background: #4f5e67;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  cursor: pointer;
+  overflow: hidden;
+  color: white;
+}
+
+.header-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.header-info h1 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-btn {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  padding: 8px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
 }
 
-.header-info h1 {
-  font-size: 24px;
-  margin: 0;
-}
-
-/* 🗑️ REMOVED - .online-count styles */
-
-.status {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  padding: 8px 16px;
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.2);
+.header-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .status-dot {
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
+  border: 2px solid var(--wa-header);
 }
 
 .status-dot.connected {
-  background: #4caf50;
-  animation: pulse 2s infinite;
+  background: #25d366;
 }
 
 .status-dot.disconnected {
   background: #f44336;
 }
 
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
-
 .typing-indicator {
-  padding: 12px 20px;
-  font-size: 14px;
-  color: #666;
-  font-style: italic;
-  background: #f8f9fa;
-  border-top: 1px solid #e9ecef;
+  position: absolute;
+  bottom: 80px;
+  left: 20px;
+  font-size: 13px;
+  color: var(--wa-accent);
+  background: rgba(255, 255, 255, 0.9);
+  padding: 4px 12px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   gap: 8px;
+  z-index: 5;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme='dark'] .typing-indicator {
+  background: rgba(0, 0, 0, 0.5);
 }
 
 .typing-dots {
   display: flex;
-  gap: 4px;
+  gap: 3px;
 }
 
 .typing-dots span {
-  width: 6px;
-  height: 6px;
-  background: #999;
+  width: 4px;
+  height: 4px;
+  background: currentColor;
   border-radius: 50%;
   animation: typing 1.4s infinite;
 }
@@ -112,36 +158,21 @@
 }
 
 @keyframes typing {
-  0%, 60%, 100% {
+
+  0%,
+  60%,
+  100% {
     transform: translateY(0);
   }
+
   30% {
-    transform: translateY(-10px);
+    transform: translateY(-4px);
   }
 }
 
 @media (max-width: 768px) {
   .chat-container {
     height: 100vh;
-    border-radius: 0;
-  }
-
-  .header-left {
-    gap: 10px;
-  }
-
-  .header-icon {
-    width: 40px;
-    height: 40px;
-    font-size: 20px;
-  }
-
-  .header-info h1 {
-    font-size: 20px;
-  }
-
-  .status {
-    padding: 6px 12px;
-    font-size: 12px;
+    max-width: 100%;
   }
 }
