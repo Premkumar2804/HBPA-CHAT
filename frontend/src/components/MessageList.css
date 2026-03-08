@@ -19,7 +19,7 @@
 .message-wrapper {
   display: flex;
   margin-bottom: 2px;
-  max-width: 80%;
+  max-width: 85%;
 }
 
 .sent-wrapper {
@@ -147,7 +147,9 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  width: 250px;
+  width: 100%;
+  max-width: 250px;
+  min-width: 180px;
   padding: 6px 0;
 }
 
@@ -246,6 +248,7 @@
 .message-image {
   width: 100%;
   max-width: 250px;
+  height: auto;
   border-radius: 8px;
   cursor: pointer;
   display: block;
@@ -261,4 +264,24 @@
 .no-messages-icon {
   font-size: 48px;
   margin-bottom: 10px;
+}
+
+@media (max-width: 480px) {
+  .messages-container {
+    padding: 10px;
+  }
+
+  .message-wrapper {
+    max-width: 92%;
+  }
+
+  .message-avatar {
+    width: 28px;
+    height: 28px;
+    margin: 0 4px;
+  }
+
+  .voice-player {
+    max-width: 200px;
+  }
 }

@@ -139,3 +139,31 @@
     padding: 8px 10px;
   }
 }
+
+@media (max-width: 480px) {
+  .chat-input-container {
+    padding: 8px 10px;
+    gap: 8px;
+  }
+
+  .username-input {
+    width: 80px;
+    font-size: 13px;
+    padding: 8px;
+  }
+
+  .message-input {
+    font-size: 14px;
+    padding: 10px 4px;
+  }
+
+  .send-button,
+  .mic-button {
+    width: 42px;
+    height: 42px;
+  }
+
+  .attach-button {
+    padding: 4px;
+  }
+}
