@@ -146,43 +146,101 @@
 .voice-player {
   display: flex;
   align-items: center;
-  gap: 12px;
-  width: 200px;
-  padding: 4px 0;
+  gap: 10px;
+  width: 250px;
+  padding: 6px 0;
 }
 
 .play-btn {
-  background: #00a884;
+  background: transparent;
   border: none;
-  border-radius: 50%;
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  color: white;
+  color: #00a884;
   flex-shrink: 0;
+  transition: transform 0.2s;
+}
+
+[data-theme='dark'] .play-btn {
+  color: #00a884;
+}
+
+.play-btn:active {
+  transform: scale(0.9);
+}
+
+.voice-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .progress-container {
-  flex: 1;
+  height: 4px;
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.progress-bg {
+  position: absolute;
+  width: 100%;
   height: 4px;
   background: rgba(0, 0, 0, 0.1);
   border-radius: 2px;
-  position: relative;
-  cursor: pointer;
+}
+
+[data-theme='dark'] .progress-bg {
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .progress-bar {
   position: absolute;
   left: 0;
-  top: 0;
-  height: 100%;
+  height: 4px;
   background: #00a884;
   border-radius: 2px;
-  transition: width 0.1s linear;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
 }
+
+.progress-thumb {
+  width: 12px;
+  height: 12px;
+  background: #00a884;
+  border-radius: 50%;
+  position: absolute;
+  right: -6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  transition: transform 0.1s;
+}
+
+.progress-container:hover .progress-thumb {
+  transform: scale(1.2);
+}
+
+.voice-meta {
+  display: flex;
+  justify-content: flex-start;
+  font-size: 11px;
+  color: #667781;
+}
+
+[data-theme='dark'] .voice-meta {
+  color: #8696a0;
+}
+
+.voice-duration {
+  font-family: monospace;
+}
+
 
 /* Image Message Styles */
 .message-image {

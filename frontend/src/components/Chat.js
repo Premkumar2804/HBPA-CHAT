@@ -1,11 +1,11 @@
-// 🔄 UPDATED FILE - Remove online users tracking
 import React, { useState, useEffect, useRef } from "react";
 import { io } from "socket.io-client";
 import MessageList from "./MessageList";
 import ChatInput from "./ChatInput";
+import Login from "./Login";
 import "./Chat.css";
 
-const socket = io(process.env.REACT_APP_SOCKET_URL, {
+const socket = io(process.env.REACT_APP_SOCKET_URL || "http://localhost:5000", {
   transports: ["websocket"],
   withCredentials: true,
 });
@@ -46,7 +46,15 @@ function Chat() {
 
     socket.on("receiveMessage", (data) => {
       setMessages((prevMessages) => {
-        if (prevMessages.find(m => m.id === data.id)) return prevMessages;
+        // Handle optimistic update: if we already have this message (by temporary ID),
+        // or if it matches the content/user/timestamp of a recently sent message, 
+        // we replace the optimistic one with the server-confirmed one.
+        const existingIndex = prevMessages.findIndex(m => m.id === data.id || m.tempId === data.tempId);
+        if (existingIndex !== -1) {
+          const newMessages = [...prevMessages];
+          newMessages[existingIndex] = data;
+          return newMessages;
+        }
         return [...prevMessages, data];
       });
 
@@ -81,33 +89,43 @@ function Chat() {
     };
   }, [currentUser]);
 
+  const handleLogin = (name) => {
+    setCurrentUser(name);
+    localStorage.setItem('chat-username', name);
+  };
+
   const sendMessage = (messageData) => {
-    const { text, user, type, voice, image, avatar } = messageData;
+    const { text, type, voice, image, avatar } = messageData;
 
     if (text?.trim() || type === 'voice' || type === 'image') {
-      const actualUser = user || currentUser;
-      if (!currentUser && actualUser) {
-        setCurrentUser(actualUser);
-        localStorage.setItem('chat-username', actualUser);
-      }
-
-      socket.emit("sendMessage", {
+      const tempId = Date.now() + Math.random();
+      const optimisticMessage = {
+        id: tempId, // Temporary ID
+        tempId: tempId,
         text,
-        user: actualUser,
+        user: currentUser,
         type: type || 'text',
         voice: voice || null,
         image: image || null,
-        avatar: avatar || userAvatar || null
+        avatar: avatar || userAvatar || null,
+        status: 'sending',
+        timestamp: new Date().toISOString()
+      };
+
+      // Optimistic Update: Add to UI immediately
+      setMessages(prev => [...prev, optimisticMessage]);
+
+      socket.emit("sendMessage", {
+        ...optimisticMessage,
+        id: undefined, // Let server assign real ID
       });
     }
   };
 
-  const handleTyping = (user) => {
-    if (!currentUser && user) {
-      setCurrentUser(user);
-      localStorage.setItem('chat-username', user);
+  const handleTyping = () => {
+    if (currentUser) {
+      socket.emit("typing", { user: currentUser });
     }
-    socket.emit("typing", { user: user || currentUser });
   };
 
   const markAsSeen = (messageId) => {
@@ -140,8 +158,13 @@ function Chat() {
   const handleLogout = () => {
     localStorage.removeItem('chat-username');
     localStorage.removeItem('chat-avatar');
-    window.location.reload();
+    setCurrentUser("");
+    setUserAvatar(null);
   };
+
+  if (!currentUser) {
+    return <Login onLogin={handleLogin} />;
+  }
 
   return (
     <div className="chat-container">

@@ -6,12 +6,44 @@ const VoicePlayer = ({ src }) => {
   const audioRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const requestRef = useRef();
+
+  const formatTime = (time) => {
+    if (isNaN(time)) return "0:00";
+    const mins = Math.floor(time / 60);
+    const secs = Math.floor(time % 60);
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };
+
+  const updateProgress = () => {
+    if (audioRef.current) {
+      const current = audioRef.current.currentTime;
+      const total = audioRef.current.duration;
+      if (total) {
+        setProgress((current / total) * 100);
+        setCurrentTime(current);
+      }
+      if (isPlaying) {
+        requestRef.current = requestAnimationFrame(updateProgress);
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (isPlaying) {
+      requestRef.current = requestAnimationFrame(updateProgress);
+    } else {
+      cancelAnimationFrame(requestRef.current);
+    }
+    return () => cancelAnimationFrame(requestRef.current);
+  }, [isPlaying]);
 
   const togglePlay = () => {
     if (audioRef.current.paused) {
       audioRef.current.play().catch(err => {
         console.error("Audio play failed:", err);
-        alert("Playback failed. Please check your volume/mute settings.");
       });
       setIsPlaying(true);
     } else {
@@ -20,23 +52,26 @@ const VoicePlayer = ({ src }) => {
     }
   };
 
-  const handleTimeUpdate = () => {
-    if (audioRef.current && audioRef.current.duration) {
-      const currentProgress = (audioRef.current.currentTime / audioRef.current.duration) * 100;
-      setProgress(currentProgress);
-    }
-  };
-
   const handleEnded = () => {
     setIsPlaying(false);
     setProgress(0);
+    setCurrentTime(0);
   };
 
   const handleSeek = (e) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const pos = (e.clientX - rect.left) / rect.width;
     if (audioRef.current && audioRef.current.duration) {
-      audioRef.current.currentTime = pos * audioRef.current.duration;
+      const newTime = pos * audioRef.current.duration;
+      audioRef.current.currentTime = newTime;
+      setProgress(pos * 100);
+      setCurrentTime(newTime);
+    }
+  };
+
+  const handleLoadedMetadata = () => {
+    if (audioRef.current) {
+      setDuration(audioRef.current.duration);
     }
   };
 
@@ -44,24 +79,31 @@ const VoicePlayer = ({ src }) => {
     <div className="voice-player">
       <button className="play-btn" onClick={togglePlay}>
         {isPlaying ? (
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
             <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
           </svg>
         ) : (
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
             <path d="M8 5v14l11-7z" />
           </svg>
         )}
       </button>
-      <div className="progress-container" onClick={handleSeek}>
-        <div className="progress-bar" style={{ width: `${progress}%` }}></div>
+      <div className="voice-info">
+        <div className="progress-container" onClick={handleSeek}>
+          <div className="progress-bg"></div>
+          <div className="progress-bar" style={{ width: `${progress}%` }}>
+            <div className="progress-thumb"></div>
+          </div>
+        </div>
+        <div className="voice-meta">
+          <span className="voice-duration">{formatTime(currentTime)} / {formatTime(duration)}</span>
+        </div>
       </div>
       <audio
         ref={audioRef}
         src={src}
-        onTimeUpdate={handleTimeUpdate}
         onEnded={handleEnded}
-        onLoadedMetadata={handleTimeUpdate}
+        onLoadedMetadata={handleLoadedMetadata}
         preload="metadata"
         playsInline
       />

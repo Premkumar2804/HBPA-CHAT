@@ -4,7 +4,6 @@ import "./ChatInput.css";
 
 function ChatInput({ onSendMessage, onTyping, currentUser, userAvatar }) {
   const [message, setMessage] = useState("");
-  const [username, setUsername] = useState(currentUser || "");
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState("0:00");
   const [showSend, setShowSend] = useState(false);
@@ -19,13 +18,9 @@ function ChatInput({ onSendMessage, onTyping, currentUser, userAvatar }) {
     setShowSend(message.trim().length > 0);
   }, [message]);
 
-  useEffect(() => {
-    setUsername(currentUser || "");
-  }, [currentUser]);
-
   const handleSend = () => {
-    if (message.trim() && username.trim()) {
-      onSendMessage({ text: message, user: username, type: 'text' });
+    if (message.trim()) {
+      onSendMessage({ text: message, type: 'text' });
       setMessage("");
     }
   };
@@ -37,10 +32,16 @@ function ChatInput({ onSendMessage, onTyping, currentUser, userAvatar }) {
     }
   };
 
+  const lastTypingTimeRef = useRef(0);
+
   const handleMessageChange = (e) => {
     setMessage(e.target.value);
-    if (username.trim()) {
-      onTyping(username);
+
+    // Throttle typing events (max once every 2 seconds)
+    const now = Date.now();
+    if (now - lastTypingTimeRef.current > 2000) {
+      onTyping();
+      lastTypingTimeRef.current = now;
     }
   };
 
@@ -79,7 +80,7 @@ function ChatInput({ onSendMessage, onTyping, currentUser, userAvatar }) {
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    if (file && username.trim()) {
+    if (file) {
       if (!file.type.startsWith('image/')) {
         alert('Please select a valid image file.');
         return;
@@ -87,7 +88,6 @@ function ChatInput({ onSendMessage, onTyping, currentUser, userAvatar }) {
 
       compressImage(file, (base64Image) => {
         onSendMessage({
-          user: username,
           text: 'Shared a photo',
           image: base64Image,
           type: 'image'
@@ -141,7 +141,6 @@ function ChatInput({ onSendMessage, onTyping, currentUser, userAvatar }) {
         reader.onloadend = () => {
           const base64Audio = reader.result;
           onSendMessage({
-            user: username,
             text: 'Voice message',
             voice: base64Audio,
             type: 'voice'
@@ -179,16 +178,6 @@ function ChatInput({ onSendMessage, onTyping, currentUser, userAvatar }) {
 
   return (
     <div className="chat-input-container">
-      {!currentUser && (
-        <input
-          type="text"
-          className="username-input"
-          placeholder="Your name..."
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-      )}
-
       <div className="input-wrapper">
         <button
           className="attach-button"
@@ -228,7 +217,7 @@ function ChatInput({ onSendMessage, onTyping, currentUser, userAvatar }) {
         <button
           className="send-button"
           onClick={handleSend}
-          disabled={!message.trim() || !username.trim()}
+          disabled={!message.trim()}
         >
           <svg viewBox="0 0 24 24" width="24" height="24">
             <path fill="currentColor" d="M1.101,21.757L23.8,12.028L1.101,2.3l0.011,7.912l13.623,1.816L1.112,13.845 L1.101,21.757z" />
@@ -238,7 +227,6 @@ function ChatInput({ onSendMessage, onTyping, currentUser, userAvatar }) {
         <button
           className={`mic-button ${isRecording ? 'recording' : ''}`}
           onClick={isRecording ? stopRecording : startRecording}
-          disabled={!username.trim()}
           title={isRecording ? "Stop Recording" : "Record Voice"}
         >
           <svg viewBox="0 0 24 24" width="24" height="24">

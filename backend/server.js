@@ -17,6 +17,7 @@ const io = new Server(server, {
         origin: "*",
         methods: ["GET", "POST"],
     },
+    maxHttpBufferSize: 1e7, // 10MB
 });
 const PORT = process.env.PORT || 5000;
 

@@ -94,6 +94,7 @@ const deleteAllMessages = (req, res) => {
 const addMessage = (messageData) => {
     const newMessage = {
         id: messages.length + 1,
+        tempId: messageData.tempId || null,
         text: messageData.text,
         user: messageData.user,
         type: messageData.type || 'text',
