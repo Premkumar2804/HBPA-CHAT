@@ -114,6 +114,29 @@ function Chat() {
     socket.emit("markAsSeen", messageId);
   };
 
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+  };
+
+  const requestNotifications = () => {
+    Notification.requestPermission().then(permission => {
+      setNotificationsEnabled(permission === 'granted');
+    });
+  };
+
+  const handleAvatarChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const base64 = e.target.result;
+        setUserAvatar(base64);
+        localStorage.setItem('chat-avatar', base64);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleLogout = () => {
     localStorage.removeItem('chat-username');
     localStorage.removeItem('chat-avatar');
