@@ -136,11 +136,6 @@ function Chat() {
     setTheme(prev => prev === 'light' ? 'dark' : 'light');
   };
 
-  const requestNotifications = () => {
-    Notification.requestPermission().then(permission => {
-      setNotificationsEnabled(permission === 'granted');
-    });
-  };
 
   const handleAvatarChange = (e) => {
     const file = e.target.files[0];
@@ -155,11 +150,27 @@ function Chat() {
     }
   };
 
+  const [toast, setToast] = useState(null);
+
+  const showToast = (message) => {
+    setToast(message);
+    setTimeout(() => setToast(null), 3000);
+  };
+
   const handleLogout = () => {
     localStorage.removeItem('chat-username');
     localStorage.removeItem('chat-avatar');
     setCurrentUser("");
     setUserAvatar(null);
+  };
+
+  const requestNotifications = () => {
+    Notification.requestPermission().then(permission => {
+      setNotificationsEnabled(permission === 'granted');
+      if (permission === 'granted') {
+        showToast("Notifications enabled!");
+      }
+    });
   };
 
   if (!currentUser) {
@@ -168,6 +179,13 @@ function Chat() {
 
   return (
     <div className="chat-container">
+      {toast && (
+        <div className="toast-container">
+          <div className="toast">
+            <span>{toast}</span>
+          </div>
+        </div>
+      )}
       <div className="chat-header">
         <div className="header-left">
           <div className="header-avatar" onClick={() => avatarInputRef.current.click()}>

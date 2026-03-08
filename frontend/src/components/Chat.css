@@ -37,6 +37,47 @@
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
 }
 
+/* Toast Styles */
+.toast-container {
+  position: absolute;
+  top: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  pointer-events: none;
+}
+
+.toast {
+  background: #202c33;
+  color: #e9edef;
+  padding: 12px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-left: 4px solid #00a884;
+  animation: slideDown 0.3s ease-out;
+  min-width: 250px;
+}
+
+[data-theme='light'] .toast {
+  background: #ffffff;
+  color: #111b21;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
 .chat-header {
   background: var(--wa-header);
   color: white;
