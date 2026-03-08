@@ -45,6 +45,7 @@
   justify-content: space-between;
   align-items: center;
   z-index: 10;
+  height: 60px;
 }
 
 .header-left {
@@ -73,16 +74,44 @@
   object-fit: cover;
 }
 
+.header-info {
+  display: flex;
+  flex-direction: column;
+}
+
 .header-info h1 {
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 500;
   margin: 0;
+}
+
+.header-status {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.status-icon {
+  font-size: 10px;
+}
+
+.status-text {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.header-status.connected .status-text {
+  color: #25d366;
+}
+
+[data-theme='dark'] .header-status.connected .status-text {
+  color: #00a884;
 }
 
 .header-right {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
 }
 
 .header-btn {
@@ -95,25 +124,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: background 0.2s;
 }
 
 .header-btn:hover {
   background: rgba(255, 255, 255, 0.1);
-}
-
-.status-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  border: 2px solid var(--wa-header);
-}
-
-.status-dot.connected {
-  background: #25d366;
-}
-
-.status-dot.disconnected {
-  background: #f44336;
 }
 
 .typing-indicator {

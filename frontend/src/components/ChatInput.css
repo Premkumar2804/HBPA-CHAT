@@ -7,6 +7,10 @@
   align-items: center;
 }
 
+[data-theme='dark'] .chat-input-container {
+  background: #202c33;
+}
+
 .input-wrapper {
   flex: 1;
   display: flex;
@@ -15,6 +19,10 @@
   padding: 0 12px;
   align-items: center;
   gap: 8px;
+}
+
+[data-theme='dark'] .input-wrapper {
+  background: #2a3942;
 }
 
 .attach-button {
@@ -28,13 +36,23 @@
   justify-content: center;
 }
 
+[data-theme='dark'] .attach-button {
+  color: #8696a0;
+}
+
 .username-input {
-  width: 100px;
+  width: 120px;
   padding: 10px;
-  border: 1px solid #ddd;
+  border: none;
   border-radius: 12px;
   font-size: 14px;
   outline: none;
+  background: white;
+}
+
+[data-theme='dark'] .username-input {
+  background: #2a3942;
+  color: white;
 }
 
 .message-input {
@@ -45,6 +63,10 @@
   font-size: 15px;
   outline: none;
   color: #111b21;
+}
+
+[data-theme='dark'] .message-input {
+  color: #e9edef;
 }
 
 .send-button,
@@ -61,7 +83,6 @@
   align-items: center;
   transition: all 0.2s;
   flex-shrink: 0;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .send-button:hover,

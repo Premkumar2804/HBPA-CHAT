@@ -6,8 +6,14 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  background-color: #e5ddd5;
+  background-color: var(--wa-bg);
   background-image: url("https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png");
+  background-blend-mode: overlay;
+}
+
+[data-theme='dark'] .messages-container {
+  background-blend-mode: soft-light;
+  filter: grayscale(0.2) contrast(1.1);
 }
 
 .message-wrapper {
@@ -58,7 +64,7 @@
   padding: 8px 12px;
   border-radius: 12px;
   position: relative;
-  font-size: 14.5px;
+  font-size: 14px;
   box-shadow: 0 1px 0.5px rgba(0, 0, 0, 0.13);
   line-height: 1.4;
 }
@@ -68,9 +74,19 @@
   color: #111b21;
 }
 
+[data-theme='dark'] .message.sent {
+  background: #005c4b;
+  color: #e9edef;
+}
+
 .message.received {
   background: #ffffff;
   color: #111b21;
+}
+
+[data-theme='dark'] .message.received {
+  background: #202c33;
+  color: #e9edef;
 }
 
 .message.system {
@@ -83,6 +99,11 @@
   border-radius: 7px;
   margin: 10px 0;
   box-shadow: 0 1px 0.5px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme='dark'] .message.system {
+  background: rgba(0, 0, 0, 0.3);
+  color: #8696a0;
 }
 
 .message-user {
@@ -105,6 +126,10 @@
   justify-content: flex-end;
   gap: 4px;
   margin-top: 4px;
+}
+
+[data-theme='dark'] .message-time {
+  color: #8696a0;
 }
 
 .status-tick {
