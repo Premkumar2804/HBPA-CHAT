@@ -98,6 +98,11 @@ function ChatInput({ onSendMessage, onTyping, currentUser, userAvatar }) {
   };
 
   const startRecording = async () => {
+    if (typeof MediaRecorder === 'undefined' || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      alert("Voice recording is not supported on this browser or connection.");
+      return;
+    }
+
     if (!window.isSecureContext && window.location.hostname !== 'localhost') {
       alert("Microphone requires a secure connection (HTTPS).");
       return;
@@ -113,8 +118,12 @@ function ChatInput({ onSendMessage, onTyping, currentUser, userAvatar }) {
         'audio/wav'
       ];
       for (const type of types) {
-        if (MediaRecorder.isTypeSupported(type)) {
-          return type;
+        try {
+          if (MediaRecorder.isTypeSupported(type)) {
+            return type;
+          }
+        } catch (e) {
+          // ignore
         }
       }
       return '';
@@ -137,7 +146,7 @@ function ChatInput({ onSendMessage, onTyping, currentUser, userAvatar }) {
         const actualMimeType = mediaRecorderRef.current.mimeType || 'audio/webm';
         const audioBlob = new Blob(audioChunksRef.current, { type: actualMimeType });
         const reader = new FileReader();
-        reader.readAsDataURL(audioBlob);
+
         reader.onloadend = () => {
           const base64Audio = reader.result;
           onSendMessage({
@@ -146,6 +155,7 @@ function ChatInput({ onSendMessage, onTyping, currentUser, userAvatar }) {
             type: 'voice'
           });
         };
+        reader.readAsDataURL(audioBlob);
         stream.getTracks().forEach(track => track.stop());
       };
 

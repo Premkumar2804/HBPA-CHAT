@@ -17,7 +17,9 @@ function Chat() {
   const [currentUser, setCurrentUser] = useState(localStorage.getItem('chat-username') || "");
   const [userAvatar, setUserAvatar] = useState(localStorage.getItem('chat-avatar') || null);
   const [theme, setTheme] = useState(localStorage.getItem('chat-theme') || 'dark');
-  const [notificationsEnabled, setNotificationsEnabled] = useState(Notification.permission === 'granted');
+  const [notificationsEnabled, setNotificationsEnabled] = useState(
+    typeof Notification !== 'undefined' && Notification.permission === 'granted'
+  );
 
   const avatarInputRef = useRef(null);
 
@@ -58,11 +60,15 @@ function Chat() {
         return [...prevMessages, data];
       });
 
-      if (data.user !== currentUser && document.hidden && Notification.permission === 'granted') {
-        new Notification(`New message from ${data.user}`, {
-          body: data.type === 'text' ? data.text : `Sent a ${data.type}`,
-          icon: '/favicon.ico'
-        });
+      if (data.user !== currentUser && document.hidden && typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+        try {
+          new Notification(`New message from ${data.user}`, {
+            body: data.type === 'text' ? data.text : `Sent a ${data.type}`,
+            icon: '/favicon.ico'
+          });
+        } catch (err) {
+          console.error("Notification creation failed:", err);
+        }
       }
     });
 
@@ -165,11 +171,19 @@ function Chat() {
   };
 
   const requestNotifications = () => {
+    if (typeof Notification === 'undefined') {
+      showToast("Notifications are not supported on this browser.");
+      return;
+    }
+
     Notification.requestPermission().then(permission => {
       setNotificationsEnabled(permission === 'granted');
       if (permission === 'granted') {
         showToast("Notifications enabled!");
       }
+    }).catch(err => {
+      console.error("Notification permission request failed:", err);
+      showToast("Could not enable notifications.");
     });
   };
 
