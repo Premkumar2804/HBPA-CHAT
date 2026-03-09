@@ -15,10 +15,13 @@
 
 .App {
   height: 100vh;
+  height: 100dvh;
   display: flex;
   justify-content: center;
   align-items: center;
   background: #dadbd3;
+  overflow: hidden;
+  overscroll-behavior: none;
 }
 
 [data-theme='dark'] .App {
@@ -30,6 +33,7 @@
   width: 100%;
   max-width: 1400px;
   height: 95vh;
+  height: 95dvh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -131,21 +135,23 @@
   gap: 4px;
 }
 
-.status-icon {
-  font-size: 10px;
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #ff4b4b;
+  display: inline-block;
+  margin-right: 4px;
+}
+
+.header-status.connected .status-dot {
+  background-color: #25d366;
+  box-shadow: 0 0 8px rgba(37, 211, 102, 0.5);
 }
 
 .status-text {
   font-size: 12px;
   opacity: 0.8;
-}
-
-.header-status.connected .status-text {
-  color: #25d366;
-}
-
-[data-theme='dark'] .header-status.connected .status-text {
-  color: #00a884;
 }
 
 .header-right {
@@ -229,10 +235,14 @@
   .App {
     padding: 0;
     align-items: stretch;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
   }
 
   .chat-container {
     height: 100vh;
+    height: 100dvh;
     width: 100vw;
     max-width: 100%;
     border-radius: 0;

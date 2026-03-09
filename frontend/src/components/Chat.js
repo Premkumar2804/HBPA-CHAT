@@ -29,6 +29,15 @@ function Chat() {
   }, [theme]);
 
   useEffect(() => {
+    // Proactively request notifications after login
+    if (currentUser && typeof Notification !== 'undefined' && Notification.permission === 'default') {
+      setTimeout(() => {
+        requestNotifications();
+      }, 2000); // Wait a bit after login
+    }
+  }, [currentUser]);
+
+  useEffect(() => {
     socket.on("connect", () => {
       setIsConnected(true);
       console.log("Connected to server");
@@ -215,8 +224,8 @@ function Chat() {
           <div className="header-info">
             <h1>HBPA Chat</h1>
             <div className={`header-status ${isConnected ? 'connected' : 'disconnected'}`}>
-              <span className="status-icon">🌐</span>
-              <span className="status-text">{isConnected ? "Connected" : "Disconnected"}</span>
+              <span className="status-dot"></span>
+              <span className="status-text">{isConnected ? "Online" : "Connecting..."}</span>
             </div>
           </div>
         </div>

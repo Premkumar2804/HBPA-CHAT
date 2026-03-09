@@ -5,6 +5,7 @@
   background: #f0f2f5;
   gap: 12px;
   align-items: center;
+  flex-shrink: 0;
 }
 
 [data-theme='dark'] .chat-input-container {
