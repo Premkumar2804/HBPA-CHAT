@@ -23,91 +23,39 @@ function Chat() {
 
   const avatarInputRef = useRef(null);
 
-  useEffect(() => {
-    document.body.setAttribute('data-theme', theme);
-    localStorage.setItem('chat-theme', theme);
-  }, [theme]);
+  // Helpers
+  const showToast = useCallback((message) => {
+    setToast(message);
+    setTimeout(() => setToast(null), 3000);
+  }, []);
 
-  useEffect(() => {
-    // Proactively request notifications after login
-    if (currentUser && typeof Notification !== 'undefined' && Notification.permission === 'default') {
-      const timer = setTimeout(() => {
-        requestNotifications();
-      }, 2000); // Wait a bit after login
-      return () => clearTimeout(timer);
+  const requestNotifications = useCallback(() => {
+    if (typeof Notification === 'undefined') {
+      showToast("Notifications are not supported on this browser.");
+      return;
     }
-  }, [currentUser, requestNotifications]);
 
-  useEffect(() => {
-    socket.on("connect", () => {
-      setIsConnected(true);
-      console.log("Connected to server");
-    });
-
-    socket.on("disconnect", () => {
-      setIsConnected(false);
-      console.log("Disconnected from server");
-    });
-
-    socket.on("message", (data) => {
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        { ...data, type: "system", id: Date.now() + Math.random() },
-      ]);
-    });
-
-    socket.on("receiveMessage", (data) => {
-      setMessages((prevMessages) => {
-        // Handle optimistic update: if we already have this message (by temporary ID),
-        // or if it matches the content/user/timestamp of a recently sent message, 
-        // we replace the optimistic one with the server-confirmed one.
-        const existingIndex = prevMessages.findIndex(m => m.id === data.id || m.tempId === data.tempId);
-        if (existingIndex !== -1) {
-          const newMessages = [...prevMessages];
-          newMessages[existingIndex] = data;
-          return newMessages;
-        }
-        return [...prevMessages, data];
-      });
-
-      if (data.user !== currentUser && document.hidden && typeof Notification !== 'undefined' && Notification.permission === 'granted') {
-        try {
-          new Notification(`New message from ${data.user}`, {
-            body: data.type === 'text' ? data.text : `Sent a ${data.type}`,
-            icon: '/favicon.ico'
-          });
-        } catch (err) {
-          console.error("Notification creation failed:", err);
-        }
+    Notification.requestPermission().then(permission => {
+      setNotificationsEnabled(permission === 'granted');
+      if (permission === 'granted') {
+        showToast("Notifications enabled!");
       }
+    }).catch(err => {
+      console.error("Notification permission request failed:", err);
+      showToast("Could not enable notifications.");
     });
-
-    socket.on("messageStatusUpdate", (data) => {
-      setMessages((prevMessages) =>
-        prevMessages.map((msg) =>
-          msg.id === data.id ? { ...msg, status: data.status } : msg
-        )
-      );
-    });
-
-    socket.on("userTyping", (data) => {
-      setTypingUser(data.user);
-      setTimeout(() => setTypingUser(""), 2000);
-    });
-
-    return () => {
-      socket.off("connect");
-      socket.off("disconnect");
-      socket.off("message");
-      socket.off("receiveMessage");
-      socket.off("messageStatusUpdate");
-      socket.off("userTyping");
-    };
-  }, [currentUser]);
+  }, [showToast]);
 
   const handleLogin = (name) => {
     setCurrentUser(name);
     localStorage.setItem('chat-username', name);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('chat-username');
+    localStorage.removeItem('chat-avatar');
+    setCurrentUser("");
+    setUserAvatar(null);
   };
 
   const sendMessage = (messageData) => {
@@ -152,7 +100,6 @@ function Chat() {
     setTheme(prev => prev === 'light' ? 'dark' : 'light');
   };
 
-
   const handleAvatarChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -166,36 +113,85 @@ function Chat() {
     }
   };
 
-  const [toast, setToast] = useState(null);
+  // Effects
+  useEffect(() => {
+    document.body.setAttribute('data-theme', theme);
+    localStorage.setItem('chat-theme', theme);
+  }, [theme]);
 
-  const showToast = (message) => {
-    setToast(message);
-    setTimeout(() => setToast(null), 3000);
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem('chat-username');
-    localStorage.removeItem('chat-avatar');
-    setCurrentUser("");
-    setUserAvatar(null);
-  };
-
-  const requestNotifications = useCallback(() => {
-    if (typeof Notification === 'undefined') {
-      showToast("Notifications are not supported on this browser.");
-      return;
+  useEffect(() => {
+    // Proactively request notifications after login
+    if (currentUser && typeof Notification !== 'undefined' && Notification.permission === 'default') {
+      const timer = setTimeout(() => {
+        requestNotifications();
+      }, 2000); // Wait a bit after login
+      return () => clearTimeout(timer);
     }
+  }, [currentUser, requestNotifications]);
 
-    Notification.requestPermission().then(permission => {
-      setNotificationsEnabled(permission === 'granted');
-      if (permission === 'granted') {
-        showToast("Notifications enabled!");
-      }
-    }).catch(err => {
-      console.error("Notification permission request failed:", err);
-      showToast("Could not enable notifications.");
+  useEffect(() => {
+    socket.on("connect", () => {
+      setIsConnected(true);
+      console.log("Connected to server");
     });
-  }, []);
+
+    socket.on("disconnect", () => {
+      setIsConnected(false);
+      console.log("Disconnected from server");
+    });
+
+    socket.on("message", (data) => {
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { ...data, type: "system", id: Date.now() + Math.random() },
+      ]);
+    });
+
+    socket.on("receiveMessage", (data) => {
+      setMessages((prevMessages) => {
+        const existingIndex = prevMessages.findIndex(m => m.id === data.id || m.tempId === data.tempId);
+        if (existingIndex !== -1) {
+          const newMessages = [...prevMessages];
+          newMessages[existingIndex] = data;
+          return newMessages;
+        }
+        return [...prevMessages, data];
+      });
+
+      if (data.user !== currentUser && document.hidden && typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+        try {
+          new Notification(`New message from ${data.user}`, {
+            body: data.type === 'text' ? data.text : `Sent a ${data.type}`,
+            icon: '/favicon.ico'
+          });
+        } catch (err) {
+          console.error("Notification creation failed:", err);
+        }
+      }
+    });
+
+    socket.on("messageStatusUpdate", (data) => {
+      setMessages((prevMessages) =>
+        prevMessages.map((msg) =>
+          msg.id === data.id ? { ...msg, status: data.status } : msg
+        )
+      );
+    });
+
+    socket.on("userTyping", (data) => {
+      setTypingUser(data.user);
+      setTimeout(() => setTypingUser(""), 2000);
+    });
+
+    return () => {
+      socket.off("connect");
+      socket.off("disconnect");
+      socket.off("message");
+      socket.off("receiveMessage");
+      socket.off("messageStatusUpdate");
+      socket.off("userTyping");
+    };
+  }, [currentUser]);
 
   if (!currentUser) {
     return <Login onLogin={handleLogin} />;
