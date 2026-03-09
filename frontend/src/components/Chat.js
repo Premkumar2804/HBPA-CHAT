@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { io } from "socket.io-client";
 import MessageList from "./MessageList";
 import ChatInput from "./ChatInput";
@@ -31,11 +31,12 @@ function Chat() {
   useEffect(() => {
     // Proactively request notifications after login
     if (currentUser && typeof Notification !== 'undefined' && Notification.permission === 'default') {
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         requestNotifications();
       }, 2000); // Wait a bit after login
+      return () => clearTimeout(timer);
     }
-  }, [currentUser]);
+  }, [currentUser, requestNotifications]);
 
   useEffect(() => {
     socket.on("connect", () => {
@@ -179,7 +180,7 @@ function Chat() {
     setUserAvatar(null);
   };
 
-  const requestNotifications = () => {
+  const requestNotifications = useCallback(() => {
     if (typeof Notification === 'undefined') {
       showToast("Notifications are not supported on this browser.");
       return;
@@ -194,7 +195,7 @@ function Chat() {
       console.error("Notification permission request failed:", err);
       showToast("Could not enable notifications.");
     });
-  };
+  }, []);
 
   if (!currentUser) {
     return <Login onLogin={handleLogin} />;
