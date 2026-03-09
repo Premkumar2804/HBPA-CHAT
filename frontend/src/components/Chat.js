@@ -32,8 +32,13 @@ function Chat() {
   }, []);
 
   const requestNotifications = useCallback(() => {
-    if (typeof Notification === 'undefined') {
-      showToast("Notifications are not supported on this browser.");
+    if (typeof Notification === 'undefined' || !('Notification' in window)) {
+      showToast("Notifications not supported in this browser. On iPhone, try 'Add to Home Screen'.");
+      return;
+    }
+
+    if (Notification.permission === 'denied') {
+      showToast("Notifications blocked. Please enable them in browser settings.");
       return;
     }
 
@@ -41,10 +46,12 @@ function Chat() {
       setNotificationsEnabled(permission === 'granted');
       if (permission === 'granted') {
         showToast("Notifications enabled!");
+      } else {
+        showToast("Notifications denied.");
       }
     }).catch(err => {
       console.error("Notification permission request failed:", err);
-      showToast("Could not enable notifications.");
+      showToast("Please tap again to allow notifications.");
     });
   }, [showToast]);
 
@@ -121,15 +128,7 @@ function Chat() {
     localStorage.setItem('chat-theme', theme);
   }, [theme]);
 
-  useEffect(() => {
-    // Proactively request notifications after login
-    if (currentUser && typeof Notification !== 'undefined' && Notification.permission === 'default') {
-      const timer = setTimeout(() => {
-        requestNotifications();
-      }, 2000); // Wait a bit after login
-      return () => clearTimeout(timer);
-    }
-  }, [currentUser, requestNotifications]);
+  /* Notifications effect removed - now gesture-based */
 
   useEffect(() => {
     socket.on("connect", () => {
