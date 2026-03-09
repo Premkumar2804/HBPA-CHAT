@@ -21,6 +21,8 @@ function Chat() {
     typeof Notification !== 'undefined' && Notification.permission === 'granted'
   );
 
+  const [toast, setToast] = useState(null);
+
   const avatarInputRef = useRef(null);
 
   // Helpers
@@ -51,14 +53,14 @@ function Chat() {
     localStorage.setItem('chat-username', name);
   };
 
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
     localStorage.removeItem('chat-username');
     localStorage.removeItem('chat-avatar');
     setCurrentUser("");
     setUserAvatar(null);
-  };
+  }, []);
 
-  const sendMessage = (messageData) => {
+  const sendMessage = useCallback((messageData) => {
     const { text, type, voice, image, avatar } = messageData;
 
     if (text?.trim() || type === 'voice' || type === 'image') {
@@ -84,21 +86,21 @@ function Chat() {
         id: undefined, // Let server assign real ID
       });
     }
-  };
+  }, [currentUser, userAvatar]);
 
-  const handleTyping = () => {
+  const handleTyping = useCallback(() => {
     if (currentUser) {
       socket.emit("typing", { user: currentUser });
     }
-  };
+  }, [currentUser]);
 
-  const markAsSeen = (messageId) => {
+  const markAsSeen = useCallback((messageId) => {
     socket.emit("markAsSeen", messageId);
-  };
+  }, []);
 
-  const toggleTheme = () => {
+  const toggleTheme = useCallback(() => {
     setTheme(prev => prev === 'light' ? 'dark' : 'light');
-  };
+  }, []);
 
   const handleAvatarChange = (e) => {
     const file = e.target.files[0];
