@@ -149,12 +149,14 @@
 
   .username-input {
     width: 80px;
-    font-size: 13px;
+    font-size: 16px;
+    /* Prevents auto-zoom on iOS */
     padding: 8px;
   }
 
   .message-input {
-    font-size: 14px;
+    font-size: 16px;
+    /* Prevents auto-zoom on iOS */
     padding: 10px 4px;
   }
 
